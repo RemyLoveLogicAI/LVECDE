@@ -96,10 +96,10 @@ export function EmptyMainScreen() {
             <Text style={styles.title}>{t('components.emptyMainScreen.readyToCode')}</Text>
             <View style={styles.terminalBlock}>
                 <Text style={[styles.terminalText, styles.terminalTextFirst]}>
-                    $ npm i -g happy-coder
+                    $ npm i -g lvecde-cli
                 </Text>
                 <Text style={styles.terminalText}>
-                    $ happy
+                    $ lvecde
                 </Text>
             </View>
 
