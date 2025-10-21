@@ -1,24 +1,24 @@
 const variant = process.env.APP_ENV || 'development';
 const name = {
-    development: "Happy (dev)",
-    preview: "Happy (preview)",
-    production: "Happy"
+    development: "LVECDE (dev)",
+    preview: "LVECDE (preview)",
+    production: "LVECDE"
 }[variant];
 const bundleId = {
-    development: "com.slopus.happy.dev",
-    preview: "com.slopus.happy.preview",
-    production: "com.ex3ndr.happy"
+    development: "ai.remylovelogic.lvecde.dev",
+    preview: "ai.remylovelogic.lvecde.preview",
+    production: "ai.remylovelogic.lvecde"
 }[variant];
 
 export default {
     expo: {
         name,
-        slug: "happy",
-        version: "1.5.1",
-        runtimeVersion: "18",
+        slug: "lvecde",
+        version: "1.0.0",
+        runtimeVersion: "1",
         orientation: "default",
         icon: "./sources/assets/images/icon.png",
-        scheme: "happy",
+        scheme: "lvecde",
         userInterfaceStyle: "automatic",
         newArchEnabled: true,
         notification: {
@@ -36,7 +36,7 @@ export default {
                 NSLocalNetworkUsageDescription: "Allow $(PRODUCT_NAME) to find and connect to local devices on your network.",
                 NSBonjourServices: ["_http._tcp", "_https._tcp"]
             },
-            associatedDomains: variant === 'production' ? ["applinks:app.happy.engineering"] : []
+            associatedDomains: []
         },
         android: {
             adaptiveIcon: {
@@ -55,20 +55,7 @@ export default {
             edgeToEdgeEnabled: true,
             package: bundleId,
             googleServicesFile: "./google-services.json",
-            intentFilters: variant === 'production' ? [
-                {
-                    "action": "VIEW",
-                    "autoVerify": true,
-                    "data": [
-                        {
-                            "scheme": "https",
-                            "host": "app.happy.engineering",
-                            "pathPrefix": "/"
-                        }
-                    ],
-                    "category": ["BROWSABLE", "DEFAULT"]
-                }
-            ] : []
+            intentFilters: []
         },
         web: {
             bundler: "metro",
@@ -149,10 +136,7 @@ export default {
             ]
         ],
         updates: {
-            url: "https://u.expo.dev/4558dd3d-cd5a-47cd-bad9-e591a241cc06",
-            requestHeaders: {
-                "expo-channel-name": "production"
-            }
+            enabled: false
         },
         experiments: {
             typedRoutes: true
@@ -162,7 +146,7 @@ export default {
                 root: "./sources/app"
             },
             eas: {
-                projectId: "4558dd3d-cd5a-47cd-bad9-e591a241cc06"
+                projectId: ""
             },
             app: {
                 postHogKey: process.env.EXPO_PUBLIC_POSTHOG_API_KEY,
@@ -171,6 +155,6 @@ export default {
                 revenueCatStripeKey: process.env.EXPO_PUBLIC_REVENUE_CAT_STRIPE
             }
         },
-        owner: "bulkacorp"
+        owner: "RemyLoveLogicAI"
     }
 };

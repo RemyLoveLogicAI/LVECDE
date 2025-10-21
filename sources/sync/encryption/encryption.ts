@@ -13,6 +13,8 @@ export class Encryption {
 
     static async create(masterSecret: Uint8Array) {
 
+        // NOTE: Key derivation salts use "Happy Coder"/"Happy EnCoder" for backward compatibility
+        // with the original Happy Coder project. Changing these would break existing accounts.
         // Derive content data key to open session and machine records
         const contentDataKey = await deriveKey(masterSecret, 'Happy EnCoder', ['content']);
 

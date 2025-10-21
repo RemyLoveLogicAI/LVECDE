@@ -1,5 +1,51 @@
 # Changelog
 
+## Version 1.0.0 - 2025-10-21
+
+**LVECDE Fork - Initial Release**
+
+This is the initial release of LVECDE (Local Voice-Enabled Code Development Environment), a fork of Happy Coder focused on local AI integration and enhanced privacy.
+
+### Fork Changes
+- Rebranded from "Happy" to "LVECDE" with new app identity
+- Updated bundle identifiers for independent distribution
+- Removed cloud service dependencies for self-hosted deployment
+- Prepared architecture for Local AI model integration
+- Updated documentation with fork information and setup guides
+- Maintained MIT License compliance with proper attribution
+
+### Architectural Preparation
+- Designed integration points for Local AI models (Ollama, LM Studio, etc.)
+- Prepared voice processing pipeline for local model integration
+- Enhanced configuration system for custom AI endpoints
+- Added environment variable support for flexible deployment
+
+### Documentation Updates
+- Comprehensive README with Local AI integration guide
+- Setup instructions for self-hosted deployment
+- Architecture documentation and customization guides
+- Comparison table with original Happy Coder
+- Security and privacy enhancements documentation
+
+### Inherited Features from Happy Coder v1.5.1
+- End-to-end encrypted session management
+- QR code authentication for secure device linking
+- Real-time synchronization across devices
+- Voice assistant capabilities (ready for local model integration)
+- File manager with syntax highlighting
+- GitHub OAuth integration
+- Multi-platform support (iOS, Android, Web)
+- Internationalization support (7 languages)
+- Dark theme with automatic detection
+- Daemon Mode for instant remote access
+- Codex integration support
+
+---
+
+## Original Happy Coder Changelog
+
+The following versions are from the original Happy Coder project before the fork.
+
 ## Version 4 - 2025-09-12
 
 This release revolutionizes remote development with Codex integration and Daemon Mode, enabling instant AI assistance from anywhere. Start coding sessions with a single tap while maintaining complete control over your development environment.
