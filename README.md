@@ -208,6 +208,12 @@ To switch from cloud AI (Claude/Codex) to Local AI:
 2. New sessions can use Local AI by default
 3. Mix and match: use cloud AI for complex tasks, local AI for quick queries
 
+### 📖 Detailed Documentation
+
+- **[Quick Start Guide](docs/LOCAL_AI_QUICK_START.md)** - Get started in 5 minutes
+- **[Complete Integration Guide](docs/LOCAL_AI_GUIDE.md)** - Full setup and configuration
+- **[Developer Documentation](docs/LOCAL_AI_DEVELOPER.md)** - Technical details for contributors
+
 ## 📚 Documentation & Contributing
 
 - **[Documentation Website](https://happy.engineering/docs/)** - Learn how to use Happy Coder effectively
