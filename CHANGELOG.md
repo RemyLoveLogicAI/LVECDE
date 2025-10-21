@@ -1,5 +1,19 @@
 # Changelog
 
+## Version 5 - 2025-10-21
+
+This release introduces comprehensive Local AI integration, empowering developers with privacy-focused, offline-capable AI models while maintaining full compatibility with existing cloud-based features.
+
+- Added Local AI support with native integration for Ollama, LM Studio, and custom model servers
+- Implemented intelligent model recommendation system based on available device memory
+- Created comprehensive configuration module for Local AI endpoints, models, and performance tuning
+- Added extensive documentation with setup guides, troubleshooting tips, and best practices
+- Built full test suite with 44+ tests covering configuration validation, model management, and provider functionality
+- Enhanced translation system with Local AI-specific messages and error handling examples
+- Maintained backward compatibility with Claude Code and Codex cloud integrations
+- Preserved end-to-end encryption for all Local AI communications
+- Supported hybrid mode allowing seamless switching between local and cloud AI providers
+
 ## Version 4 - 2025-09-12
 
 This release revolutionizes remote development with Codex integration and Daemon Mode, enabling instant AI assistance from anywhere. Start coding sessions with a single tap while maintaining complete control over your development environment.

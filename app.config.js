@@ -169,6 +169,12 @@ export default {
                 revenueCatAppleKey: process.env.EXPO_PUBLIC_REVENUE_CAT_APPLE,
                 revenueCatGoogleKey: process.env.EXPO_PUBLIC_REVENUE_CAT_GOOGLE,
                 revenueCatStripeKey: process.env.EXPO_PUBLIC_REVENUE_CAT_STRIPE
+            },
+            localAI: {
+                enabled: process.env.EXPO_PUBLIC_LOCAL_AI_ENABLED === 'true',
+                provider: process.env.EXPO_PUBLIC_LOCAL_AI_PROVIDER || 'ollama',
+                endpoint: process.env.EXPO_PUBLIC_LOCAL_AI_ENDPOINT || 'http://localhost:11434',
+                model: process.env.EXPO_PUBLIC_LOCAL_AI_MODEL || 'llama3.2'
             }
         },
         owner: "bulkacorp"
