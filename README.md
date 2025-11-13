@@ -62,6 +62,7 @@ On your computer, run `happy` instead of `claude` or `happy codex` instead of `c
 - ⚡ **Switch devices instantly** - Take control from phone or desktop with one keypress
 - 🔐 **End-to-end encrypted** - Your code never leaves your devices unencrypted
 - 🛠️ **Open source** - Audit the code yourself. No telemetry, no tracking
+- 🤖 **Local AI Support** - Run AI models locally for enhanced privacy and offline capabilities
 
 ## 📦 Project Components
 
@@ -72,6 +73,146 @@ On your computer, run `happy` instead of `claude` or `happy codex` instead of `c
 ## 🏠 Who We Are
 
 We're engineers scattered across Bay Area coffee shops and hacker houses, constantly checking how our AI coding agents are progressing on our pet projects during lunch breaks. Happy Coder was born from the frustration of not being able to peek at our AI coding tools building our side hustles while we're away from our keyboards. We believe the best tools come from scratching your own itch and sharing with the community.
+
+## 🤖 Local AI Integration
+
+Happy Coder now supports Local AI models, allowing you to run AI models directly on your machine for enhanced privacy, offline capabilities, and reduced latency.
+
+### Benefits of Local AI
+
+- **🔒 Enhanced Privacy**: Your code and conversations never leave your machine
+- **📶 Offline Capability**: Work without an internet connection
+- **⚡ Reduced Latency**: Faster response times by eliminating network roundtrips
+- **💰 Cost Effective**: No API costs for local model inference
+- **🎛️ Full Control**: Choose and customize your preferred models
+
+### Supported Local AI Models
+
+Happy Coder integrates with popular open-source AI models:
+
+- **Llama 3.x** - Meta's latest language models
+- **Mistral/Mixtral** - High-performance open models
+- **CodeLlama** - Specialized for code understanding
+- **Phi-3** - Microsoft's efficient small models
+- **Gemma** - Google's open models
+
+### Setup Local AI
+
+#### Prerequisites
+
+1. Install [Ollama](https://ollama.ai/) or [LM Studio](https://lmstudio.ai/)
+2. Download your preferred model:
+
+```bash
+# For Ollama
+ollama pull llama3.2
+ollama pull codellama
+
+# Or use any compatible model
+```
+
+#### Configuration
+
+1. **Configure the Local AI endpoint in Happy Coder settings**:
+   - Open the app settings
+   - Navigate to "AI Configuration"
+   - Select "Local AI" as your provider
+   - Set the endpoint URL (default: `http://localhost:11434` for Ollama)
+
+2. **Environment Variables** (for CLI):
+
+```bash
+# Set in your shell configuration (~/.bashrc, ~/.zshrc, etc.)
+export HAPPY_AI_PROVIDER="local"
+export HAPPY_AI_ENDPOINT="http://localhost:11434"
+export HAPPY_AI_MODEL="llama3.2"
+```
+
+3. **Start using with Local AI**:
+
+```bash
+# The CLI will automatically use your configured Local AI
+happy
+
+# Or explicitly specify Local AI
+happy --ai-provider local --ai-model llama3.2
+```
+
+### Local AI + Voice Features
+
+Happy Coder's voice features work seamlessly with Local AI:
+
+1. **Local Voice Recognition**: Use on-device speech recognition
+2. **Local Text-to-Speech**: Generate voice responses locally
+3. **Hybrid Mode**: Combine local AI models with cloud-based voice services
+
+To configure:
+
+```bash
+# Enable local voice processing
+export HAPPY_VOICE_LOCAL=true
+```
+
+### Advanced Configuration
+
+#### Custom Model Endpoints
+
+You can configure multiple Local AI endpoints for different use cases:
+
+```bash
+# Main coding assistant
+export HAPPY_AI_CODING_ENDPOINT="http://localhost:11434"
+export HAPPY_AI_CODING_MODEL="codellama"
+
+# Documentation and explanation
+export HAPPY_AI_DOCS_ENDPOINT="http://localhost:11435"
+export HAPPY_AI_DOCS_MODEL="llama3.2"
+```
+
+#### Performance Tuning
+
+Optimize Local AI performance:
+
+```bash
+# Adjust context window size
+export HAPPY_AI_CONTEXT_SIZE=4096
+
+# Enable GPU acceleration
+export HAPPY_AI_GPU=true
+
+# Set number of threads
+export HAPPY_AI_THREADS=8
+```
+
+### Troubleshooting
+
+**Issue**: Local AI not connecting
+- Verify Ollama/LM Studio is running: `curl http://localhost:11434/api/tags`
+- Check firewall settings allow local connections
+- Ensure the model is downloaded: `ollama list`
+
+**Issue**: Slow responses
+- Try a smaller model (e.g., `phi3` instead of `llama3.2:70b`)
+- Enable GPU acceleration if available
+- Reduce context window size
+
+**Issue**: Encryption errors with Local AI
+- Ensure you're using the latest version of Happy Coder
+- Local AI traffic is still encrypted end-to-end between devices
+
+### Migration from Cloud to Local AI
+
+To switch from cloud AI (Claude/Codex) to Local AI:
+
+1. Keep your existing sessions - they'll continue to work
+2. New sessions can use Local AI by default
+3. Mix and match: use cloud AI for complex tasks, local AI for quick queries
+
+### 📖 Detailed Documentation
+
+- **[Quick Start Guide](docs/LOCAL_AI_QUICK_START.md)** - Get started in 5 minutes
+- **[Complete Integration Guide](docs/LOCAL_AI_GUIDE.md)** - Full setup and configuration
+- **[Developer Documentation](docs/LOCAL_AI_DEVELOPER.md)** - Technical details for contributors
 
 ## 📚 Documentation & Contributing
 

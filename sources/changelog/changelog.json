@@ -1,6 +1,23 @@
 {
   "entries": [
     {
+      "version": 5,
+      "date": "2025-10-21",
+      "summary": "This release introduces comprehensive Local AI integration, empowering developers with privacy-focused, offline-capable AI models while maintaining full compatibility with existing cloud-based features.",
+      "changes": [
+        "Added Local AI support with native integration for Ollama, LM Studio, and custom model servers",
+        "Implemented intelligent model recommendation system based on available device memory",
+        "Created comprehensive configuration module for Local AI endpoints, models, and performance tuning",
+        "Added extensive documentation with setup guides, troubleshooting tips, and best practices",
+        "Built full test suite with 44+ tests covering configuration validation, model management, and provider functionality",
+        "Enhanced translation system with Local AI-specific messages and error handling examples",
+        "Maintained backward compatibility with Claude Code and Codex cloud integrations",
+        "Preserved end-to-end encryption for all Local AI communications",
+        "Supported hybrid mode allowing seamless switching between local and cloud AI providers"
+      ],
+      "rawMarkdown": "## Version 5 - 2025-10-21\n\n\nThis release introduces comprehensive Local AI integration, empowering developers with privacy-focused, offline-capable AI models while maintaining full compatibility with existing cloud-based features.\n\n- Added Local AI support with native integration for Ollama, LM Studio, and custom model servers\n- Implemented intelligent model recommendation system based on available device memory\n- Created comprehensive configuration module for Local AI endpoints, models, and performance tuning\n- Added extensive documentation with setup guides, troubleshooting tips, and best practices\n- Built full test suite with 44+ tests covering configuration validation, model management, and provider functionality\n- Enhanced translation system with Local AI-specific messages and error handling examples\n- Maintained backward compatibility with Claude Code and Codex cloud integrations\n- Preserved end-to-end encryption for all Local AI communications\n- Supported hybrid mode allowing seamless switching between local and cloud AI providers"
+    },
+    {
       "version": 4,
       "date": "2025-09-12",
       "summary": "This release revolutionizes remote development with Codex integration and Daemon Mode, enabling instant AI assistance from anywhere. Start coding sessions with a single tap while maintaining complete control over your development environment.",
@@ -53,5 +70,5 @@
       "rawMarkdown": "## Version 1 - 2025-05-12\n\n\nWelcome to Happy - your secure, encrypted mobile companion for Claude Code. This inaugural release establishes the foundation for private, powerful AI interactions on the go.\n\n- Implemented end-to-end encrypted session management ensuring complete privacy\n- Integrated intelligent voice assistant with natural conversation capabilities\n- Added experimental file manager with syntax highlighting and tree navigation\n- Built seamless real-time synchronization across all your devices\n- Established native support for iOS, Android, and responsive web interfaces"
     }
   ],
-  "latestVersion": 4
+  "latestVersion": 5
 }

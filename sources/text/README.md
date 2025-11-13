@@ -221,3 +221,212 @@ To add more languages:
 4. All existing type safety is preserved
 
 This implementation provides a solid foundation that can scale while maintaining perfect type safety and developer experience.
+
+## Local AI Integration Examples
+
+When integrating with Local AI models, use translations to provide clear feedback:
+
+### AI Provider Status Messages
+
+```typescript
+// Translation definitions
+export const en = {
+    ai: {
+        // Provider status
+        providerConnecting: ({ provider }: { provider: string }) => 
+            `Connecting to ${provider}...`,
+        providerConnected: ({ provider }: { provider: string }) => 
+            `Connected to ${provider}`,
+        providerDisconnected: ({ provider }: { provider: string }) => 
+            `Disconnected from ${provider}`,
+        providerError: ({ provider, error }: { provider: string; error: string }) => 
+            `Error connecting to ${provider}: ${error}`,
+        
+        // Model selection
+        modelLoading: ({ model }: { model: string }) => 
+            `Loading model: ${model}`,
+        modelLoaded: ({ model }: { model: string }) => 
+            `Model ${model} is ready`,
+        modelNotFound: ({ model }: { model: string }) => 
+            `Model ${model} not found. Please download it first.`,
+        
+        // Local AI specific
+        localAIOffline: 'Local AI service is not running',
+        localAIConfiguring: 'Configuring Local AI connection...',
+        localAIReady: 'Local AI is ready to use',
+        
+        // Performance indicators
+        responseTime: ({ ms }: { ms: number }) => 
+            ms < 1000 ? 'Fast response' : `Response in ${Math.round(ms / 1000)}s`,
+        tokensPerSecond: ({ tps }: { tps: number }) => 
+            `${tps.toFixed(1)} tokens/sec`,
+    }
+} as const;
+
+// Usage in components
+import { t } from '@/text';
+
+function LocalAIStatus({ provider, connected, model }: Props) {
+    return (
+        <View>
+            <Text>
+                {connected 
+                    ? t('ai.providerConnected', { provider })
+                    : t('ai.providerConnecting', { provider })
+                }
+            </Text>
+            {model && (
+                <Text>{t('ai.modelLoaded', { model })}</Text>
+            )}
+        </View>
+    );
+}
+```
+
+### Error Handling Edge Cases
+
+```typescript
+// Translation definitions for edge cases
+export const en = {
+    errors: {
+        // Network related
+        networkTimeout: ({ timeout }: { timeout: number }) => 
+            `Request timed out after ${timeout} seconds`,
+        networkUnreachable: ({ host }: { host: string }) => 
+            `Cannot reach ${host}. Check your connection.`,
+        
+        // Local AI specific errors
+        localAINotInstalled: 'Local AI software not detected. Install Ollama or LM Studio.',
+        localAIModelMissing: ({ model }: { model: string }) => 
+            `Model ${model} is not downloaded. Run: ollama pull ${model}`,
+        localAIOutOfMemory: 'Insufficient memory for model. Try a smaller model.',
+        localAIPortInUse: ({ port }: { port: number }) => 
+            `Port ${port} is already in use. Check if another instance is running.`,
+        
+        // Encryption errors
+        encryptionFailed: ({ reason }: { reason: string }) => 
+            `Encryption failed: ${reason}`,
+        decryptionFailed: 'Failed to decrypt message. Keys may be mismatched.',
+        
+        // Session errors
+        sessionExpired: 'Your session has expired. Please reconnect.',
+        sessionConflict: 'Session is active on another device.',
+    }
+} as const;
+
+// Usage with error boundaries
+try {
+    await connectToLocalAI();
+} catch (error) {
+    if (error.code === 'ECONNREFUSED') {
+        showError(t('errors.networkUnreachable', { host: 'localhost:11434' }));
+    } else if (error.code === 'MODEL_NOT_FOUND') {
+        showError(t('errors.localAIModelMissing', { model: 'llama3.2' }));
+    } else {
+        showError(t('errors.encryptionFailed', { reason: error.message }));
+    }
+}
+```
+
+### Complex Pluralization and Formatting
+
+```typescript
+// Advanced pluralization for AI features
+export const en = {
+    ai: {
+        // Context window usage
+        contextUsage: ({ used, total }: { used: number; total: number }) => {
+            const percentage = Math.round((used / total) * 100);
+            if (percentage < 50) return `${used}/${total} tokens (${percentage}%)`;
+            if (percentage < 80) return `${used}/${total} tokens (${percentage}%) - Consider summarizing`;
+            return `${used}/${total} tokens (${percentage}%) - Context nearly full`;
+        },
+        
+        // Model size formatting
+        modelSize: ({ bytes }: { bytes: number }) => {
+            if (bytes < 1024 ** 3) return `${Math.round(bytes / (1024 ** 2))} MB`;
+            return `${(bytes / (1024 ** 3)).toFixed(1)} GB`;
+        },
+        
+        // Session duration
+        sessionDuration: ({ minutes }: { minutes: number }) => {
+            if (minutes < 1) return 'Just started';
+            if (minutes < 60) return `${Math.round(minutes)} minute${minutes === 1 ? '' : 's'}`;
+            const hours = Math.floor(minutes / 60);
+            const mins = Math.round(minutes % 60);
+            return `${hours}h ${mins}m`;
+        },
+    }
+} as const;
+```
+
+### Best Practices for AI-Related Translations
+
+1. **Be specific about the AI provider**:
+   ```typescript
+   // ✅ Good: Clear which provider
+   t('ai.providerConnected', { provider: 'Local AI (Ollama)' })
+   
+   // ❌ Bad: Ambiguous
+   t('ai.connected')
+   ```
+
+2. **Provide actionable error messages**:
+   ```typescript
+   // ✅ Good: Tells user what to do
+   t('errors.localAINotInstalled') // "Install Ollama or LM Studio"
+   
+   // ❌ Bad: Vague error
+   t('errors.aiError') // "AI error occurred"
+   ```
+
+3. **Include performance context**:
+   ```typescript
+   // ✅ Good: Helps user understand what's happening
+   t('ai.responseTime', { ms: 1500 }) // "Response in 2s"
+   t('ai.tokensPerSecond', { tps: 15.3 }) // "15.3 tokens/sec"
+   ```
+
+4. **Handle edge cases gracefully**:
+   ```typescript
+   // Handle zero/null values
+   sessionDuration: ({ minutes }: { minutes: number }) => {
+       if (minutes === 0 || !minutes) return 'Just started';
+       // ... rest of logic
+   }
+   ```
+
+## Testing Translations
+
+### Unit Testing Example
+
+```typescript
+import { describe, it, expect } from 'vitest';
+import { t } from '@/text';
+
+describe('AI translations', () => {
+    it('should format provider connection messages', () => {
+        expect(t('ai.providerConnecting', { provider: 'Ollama' }))
+            .toBe('Connecting to Ollama...');
+    });
+    
+    it('should handle model loading states', () => {
+        expect(t('ai.modelLoading', { model: 'llama3.2' }))
+            .toBe('Loading model: llama3.2');
+    });
+    
+    it('should format context usage warnings', () => {
+        const result = t('ai.contextUsage', { used: 3500, total: 4096 });
+        expect(result).toContain('85%');
+        expect(result).toContain('Context nearly full');
+    });
+});
+```
+
+### Edge Cases to Test
+
+- **Empty strings**: What happens with empty model names?
+- **Very large numbers**: How to format 100GB models?
+- **Negative values**: Handle invalid inputs gracefully
+- **Special characters**: Unicode in model names
+- **Null/undefined**: Always provide fallbacks
