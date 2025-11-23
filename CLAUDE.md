@@ -13,8 +13,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `yarn typecheck` - Run TypeScript type checking after all changes
 
 ### Testing
-- `yarn test` - Run tests in watch mode (Jest with jest-expo preset)
-- No existing tests in the codebase yet
+- `yarn test` - Run tests in watch mode (Vitest with jest-expo preset)
+- Test files use `.test.ts` suffix for unit tests or `.spec.ts` for integration/behavior tests
+- 44+ tests across the codebase with 100% pass rate required
+- Test files located alongside source files (e.g., `sync/localAI.test.ts`, `utils/debounce.test.ts`)
+- Coverage: sync system, state management, encryption, AI providers, utilities, components
 
 ### Production
 - `yarn ota` - Deploy over-the-air updates via EAS Update to production branch
@@ -71,21 +74,68 @@ This generates `sources/changelog/changelog.json` which is used by the app.
 ## Architecture Overview
 
 ### Core Technology Stack
-- **React Native** with **Expo** SDK 53
-- **TypeScript** with strict mode enabled
-- **Unistyles** for cross-platform styling with themes and breakpoints
-- **Expo Router v5** for file-based routing
-- **Socket.io** for real-time WebSocket communication
-- **tweetnacl** for end-to-end encryption
+- **React** 19.1.0 with **React Native** 0.81.4
+- **Expo** SDK 54
+- **TypeScript** 5.9.2 with strict mode enabled
+- **Unistyles** 3.0.10 for cross-platform styling with themes and breakpoints
+- **Expo Router** v6 for file-based routing with typed routes
+- **Socket.io** 4.8.1 for real-time WebSocket communication
+- **tweetnacl** (libsodium-wrappers) for end-to-end encryption
+- **Vitest** 3.2.4 for testing (with jest-expo preset)
+- **Zustand** 5.0.6 for additional state management
 
 ### Project Structure
 ```
 sources/
-├── app/              # Expo Router screens
-├── auth/             # Authentication logic (QR code based)
-├── components/       # Reusable UI components
-├── sync/             # Real-time sync engine with encryption
-└── utils/            # Utility functions
+├── app/                    # Expo Router screens (file-based routing)
+│   ├── (app)/             # Authenticated app routes
+│   └── _layout.tsx        # Root navigation layout
+├── auth/                   # Authentication logic (QR code based)
+├── components/             # Reusable UI components
+│   ├── Item.tsx           # Core list item component
+│   ├── ItemList.tsx       # Container for lists
+│   ├── ItemGroup.tsx      # Grouped list component
+│   ├── layout.ts          # Layout width constraints
+│   ├── CommandPalette/    # Command palette system
+│   ├── autocomplete/      # Text autocomplete
+│   ├── diff/              # Git diff visualization
+│   ├── markdown/          # Markdown rendering
+│   └── navigation/        # Navigation components (Header)
+├── sync/                   # Real-time sync engine with encryption
+│   ├── sync.ts            # Main sync orchestration class
+│   ├── reducer/           # State management reducers
+│   ├── encryption/        # End-to-end encryption
+│   ├── git-parsers/       # Git status/diff parsers
+│   ├── revenueCat/        # In-app purchases
+│   ├── localAI.ts         # Local AI configuration
+│   ├── localAIProvider.ts # Local AI session management
+│   └── localAIEnv.ts      # Environment variable handling
+├── hooks/                  # Custom React hooks (20+ hooks)
+│   ├── useHappyAction.ts  # Async action error handling
+│   ├── useGlobalKeyboard.ts # Web keyboard shortcuts
+│   └── useAutocomplete.ts # Text autocomplete logic
+├── modal/                  # Cross-platform modal system
+│   ├── ModalManager.ts    # Modal orchestration
+│   ├── ModalProvider.tsx  # React context provider
+│   └── types.ts           # Modal type definitions
+├── text/                   # Internationalization (i18n)
+│   ├── translations/      # Language files (en, ru, pl, es, pt, ca, zh-Hans)
+│   ├── _default.ts        # English default translations
+│   ├── _all.ts            # Language metadata & configuration
+│   └── index.ts           # Type-safe translation function
+├── utils/                  # Utility functions
+│   ├── sync.ts            # InvalidateSync & ValueSync classes
+│   ├── lock.ts            # AsyncLock for exclusive async operations
+│   └── errors.ts          # HappyError class
+├── realtime/               # WebSocket/real-time features
+├── track/                  # Analytics & tracking
+├── -session/               # Session management
+├── -zen/                   # Zen/todo features
+├── docs/                   # In-app documentation
+├── changelog/              # Changelog data
+├── scripts/                # Build scripts
+│   └── parseChangelog.ts  # CHANGELOG.md parser
+└── trash/                  # Temporary scripts & tests
 ```
 
 ### Key Architectural Patterns
@@ -132,7 +182,7 @@ t('errors.fieldError', { field: 'Email', reason: 'Invalid format' })
 
 1. **Check existing keys first** - Always check if the string already exists in the `common` object or other sections before adding new keys
 2. **Think about context** - Consider the screen/component context when choosing the appropriate section (e.g., `settings.*`, `session.*`, `errors.*`)
-3. **Add to ALL languages** - When adding new strings, you MUST add them to all language files in `sources/text/translations/` (currently: `en`, `ru`, `pl`, `es`)
+3. **Add to ALL languages** - When adding new strings, you MUST add them to all language files in `sources/text/translations/` (currently: `en`, `ru`, `pl`, `es`, `pt`, `ca`, `zh-Hans` - 7 languages total)
 4. **Use descriptive key names** - Use clear, hierarchical keys like `newSession.machineOffline` rather than generic names
 5. **Language metadata** - All supported languages and their metadata are centralized in `sources/text/_all.ts`
 
@@ -204,6 +254,79 @@ The agent should be called whenever new user-facing text is introduced to the co
 - `sources/sync/reducer.ts` - State management logic for sync operations
 - `sources/auth/AuthContext.tsx` - Authentication state management
 - `sources/app/_layout.tsx` - Root navigation structure
+- `sources/sync/sync.ts` - Main sync orchestration class
+- `sources/utils/sync.ts` - InvalidateSync & ValueSync classes
+- `sources/utils/lock.ts` - AsyncLock for exclusive async operations
+- `sources/modal/index.ts` - Modal system (replaces React Native Alert)
+- `sources/hooks/useHappyAction.ts` - Async action error handling
+
+### State Management
+
+The app uses a custom sync system centered around the `Sync` class for primary state management.
+
+#### Core Patterns
+
+**1. InvalidateSync** (`sources/utils/sync.ts`)
+- Invalidation-based synchronization for resources
+- Automatic retry with exponential backoff
+- Queue management for pending operations
+- Used for: sessions, settings, profile, machines, artifacts, friends, feed
+
+```typescript
+// Trigger invalidation and refetch
+sync.sessionsSync.invalidate();
+
+// Wait for completion
+await sync.settingsSync.invalidateAndAwait();
+```
+
+**2. ValueSync** (`sources/utils/sync.ts`)
+- Value-based synchronization for data changes
+- Processes latest value only (not queued)
+- Automatic retry mechanism
+- Used for real-time updates
+
+**3. AsyncLock** (`sources/utils/lock.ts`)
+- Exclusive async operation locking
+- Prevents race conditions in critical sections
+- Used for font loading, encryption operations, etc.
+
+```typescript
+import { AsyncLock } from '@/utils/lock';
+
+const lock = new AsyncLock();
+
+await lock.inLock(async () => {
+    // Critical section - only one execution at a time
+});
+```
+
+**4. React Context**
+- `AuthProvider` - Authentication state
+- `ModalProvider` - Modal management
+- `RealtimeProvider` - WebSocket connections
+- `CommandPaletteProvider` - Command palette state
+
+**5. Zustand**
+- Used for specific feature state (not global)
+- Lighter weight for component-level state
+
+#### Data Flow
+```
+User Action
+    ↓
+Component calls sync.method()
+    ↓
+InvalidateSync.invalidate()
+    ↓
+API call with encryption (tweetnacl)
+    ↓
+WebSocket update (Socket.io)
+    ↓
+Storage persistence (MMKV)
+    ↓
+Component re-render
+```
 
 ### Custom Header Component
 
@@ -431,6 +554,192 @@ const MyComponent = () => {
 6. **Leverage breakpoints** for responsive design rather than manual dimension calculations
 7. **Keep styles close to components** but extract common patterns to shared stylesheets
 8. **Use TypeScript** for better developer experience and type safety
+
+## Local AI Integration
+
+The app supports Local AI models through Ollama, LM Studio, and custom model servers, enabling privacy-focused, offline-capable AI functionality.
+
+### Configuration
+
+Set environment variables in `.env` file (see `.env.example` for template):
+
+```bash
+# Enable/disable Local AI
+EXPO_PUBLIC_LOCAL_AI_ENABLED=true
+
+# Provider: "ollama", "lmstudio", or "custom"
+EXPO_PUBLIC_LOCAL_AI_PROVIDER=ollama
+
+# Endpoint URL
+EXPO_PUBLIC_LOCAL_AI_ENDPOINT=http://localhost:11434
+
+# Model name
+EXPO_PUBLIC_LOCAL_AI_MODEL=llama3.2
+
+# Performance tuning (optional)
+HAPPY_LOCAL_AI_CONTEXT_SIZE=4096
+HAPPY_LOCAL_AI_TEMPERATURE=0.7
+HAPPY_LOCAL_AI_THREADS=4
+HAPPY_LOCAL_AI_GPU=true
+
+# Multiple endpoints for different tasks (optional)
+HAPPY_LOCAL_AI_CODING_ENDPOINT=http://localhost:11434
+HAPPY_LOCAL_AI_CODING_MODEL=codellama
+```
+
+### Key Files
+
+- `sources/sync/localAI.ts` - Configuration and validation module
+- `sources/sync/localAIProvider.ts` - Session management and streaming
+- `sources/sync/localAIEnv.ts` - Environment variable handling
+- `sources/sync/localAI.test.ts` - Configuration tests (28 tests)
+- `sources/sync/localAIProvider.test.ts` - Provider tests (16 tests)
+
+### Supported Models
+
+Memory-aware recommendations based on available RAM:
+- **phi3** (2.3 GB) - Requires 4+ GB RAM
+- **mistral** (4.1 GB) - Requires 6+ GB RAM
+- **llama3.2** (3.8 GB) - Requires 8+ GB RAM
+- **codellama** (3.8 GB) - Requires 8+ GB RAM
+- **llama3.2:70b** (40 GB) - Requires 64+ GB RAM
+
+### Features
+
+- Streaming response support
+- Session management with conversation history
+- Integration with existing VoiceSession interface
+- Automatic service availability checking
+- Memory-aware model recommendations
+- Multiple endpoint support for different tasks
+
+### Documentation
+
+- [Quick Start Guide](../docs/LOCAL_AI_QUICK_START.md) - 5-minute setup
+- [User Guide](../docs/LOCAL_AI_GUIDE.md) - Comprehensive guide
+- [Developer Documentation](../docs/LOCAL_AI_DEVELOPER.md) - Technical architecture
+- [Implementation Summary](../docs/LOCAL_AI_IMPLEMENTATION_SUMMARY.md) - Implementation details
+
+### Usage Pattern
+
+```typescript
+import { LocalAIProvider } from '@/sync/localAIProvider';
+import { getLocalAIConfig } from '@/sync/localAI';
+
+// Get configuration
+const config = getLocalAIConfig();
+if (config.enabled) {
+    // Create session
+    const provider = new LocalAIProvider(config);
+    const session = await provider.createSession('general');
+
+    // Send message with streaming
+    await session.sendMessage('Hello!', (chunk) => {
+        console.log('Received:', chunk);
+    });
+}
+```
+
+## Component Library Reference
+
+### Core Components
+
+The app includes a comprehensive component library designed for consistency across platforms.
+
+#### Item Component (`sources/components/Item.tsx`)
+Primary list item component - **always use this first** before creating custom components.
+
+**Props:**
+- `title` - Main text
+- `subtitle` - Secondary text
+- `detail` - Right-side detail text
+- `icon` - Left icon (Ionicons name or custom element)
+- `leftElement` - Custom left component
+- `rightElement` - Custom right component
+- `onPress` - Press handler
+- `onLongPress` - Long press handler
+- `loading` - Show loading indicator
+- `selected` - Selected state styling
+- `destructive` - Destructive action styling
+- `chevron` - Show right chevron
+- `divider` - Show bottom divider
+- `copy` - Enable copy-to-clipboard on long press
+
+**Usage:**
+```typescript
+import { Item } from '@/components/Item';
+
+<Item
+    title="Settings"
+    subtitle="Manage your preferences"
+    icon="settings-outline"
+    chevron
+    onPress={() => router.push('/settings')}
+/>
+```
+
+#### ItemList Component (`sources/components/ItemList.tsx`)
+Container for Item components - **use for most UI containers**.
+
+**Features:**
+- Inset grouped style (iOS)
+- Automatic background color management
+- ScrollView wrapper
+
+**Usage:**
+```typescript
+import { ItemList } from '@/components/ItemList';
+import { Item } from '@/components/Item';
+
+<ItemList>
+    <Item title="Option 1" />
+    <Item title="Option 2" />
+    <Item title="Option 3" />
+</ItemList>
+```
+
+#### ItemGroup Component (`sources/components/ItemGroup.tsx`)
+Groups related items with optional header/footer.
+
+**Props:**
+- `header` - Group header text
+- `footer` - Group footer text
+- `children` - Item components
+
+#### Avatar Component (`sources/components/Avatar.tsx`)
+User avatar display - **always use for avatars, never create custom**.
+
+#### Layout Constraints (`sources/components/layout.ts`)
+Responsive design helper for consistent widths across device sizes.
+
+**Constants:**
+- `layout.maxWidth` - 800px (tablets/web), 1400px (Mac Catalyst), full width (phones)
+- `layout.headerMaxWidth` - Similar constraints for headers
+
+**Usage:**
+```typescript
+import { layout } from '@/components/layout';
+import { useStyles } from 'react-native-unistyles';
+
+const { breakpoint } = useStyles();
+
+<ScrollView
+    contentContainerStyle={{
+        maxWidth: layout.maxWidth[breakpoint],
+        alignSelf: 'center',
+        width: '100%'
+    }}
+>
+    {/* Content */}
+</ScrollView>
+```
+
+### Other Components
+
+- **CommandPalette** - Global command search (sources/components/CommandPalette/)
+- **DiffView** - Git diff visualization (sources/components/diff/)
+- **MarkdownView** - Markdown rendering (sources/components/markdown/)
+- **Modal** - Cross-platform modal system (sources/modal/) - **replaces React Native Alert**
 
 ## Project Scope and Priorities
 
