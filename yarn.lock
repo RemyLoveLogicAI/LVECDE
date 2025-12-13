@@ -7538,10 +7538,12 @@ react-is@^19.0.0, react-is@^19.1.0:
   resolved "https://registry.npmjs.org/react-is/-/react-is-19.1.0.tgz"
   integrity sha512-Oe56aUPnkHyyDxxkvqtd7KkdQP5uIUfHxd5XTb3wE9d/kRnZLmKbDB0GWk919tdQ+mxxPtG6EAs6RMT6i1qtHg==
 
-react-native-audio-api@^0.8.2:
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/react-native-audio-api/-/react-native-audio-api-0.8.2.tgz#5deb4ffe07538b8d1c747af3903025632a23f6a2"
-  integrity sha512-p+a7gL1wy09yXoqUTYdO+tAQe/G7DpWFrFUDULu4dFUsyPaVd0T10Y7Nf5P391Ldg5A6F/aIfoUtKf150RyKmw==
+react-native-audio-api@^0.10.1:
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/react-native-audio-api/-/react-native-audio-api-0.10.2.tgz#ded38e3f8ae1ff2dc96536cdb3ec470e410fac19"
+  integrity sha512-4Wgu3NMWydMhxgD1ugxbL7OGGPymCWLstvW0s43/2gxJTZIIuppJp1lbn5mRlFaflhpUeusBSE+tYXaHSRAJbA==
+  dependencies:
+    semver "^7.7.3"
 
 react-native-device-info@^14.1.1:
   version "14.1.1"
@@ -8228,6 +8230,11 @@ semver@^6.3.0, semver@^6.3.1:
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.1.tgz#556d2ef8689146e46dcea4bfdd095f3434dffcb4"
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
+
+semver@^7.7.3:
+  version "7.7.3"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.3.tgz#4b5f4143d007633a8dc671cd0a6ef9147b8bb946"
+  integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==
 
 semver@~7.6.3:
   version "7.6.3"
