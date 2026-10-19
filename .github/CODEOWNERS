@@ -1,2 +1,2 @@
-# Default reviewer for everything. Add narrower rules above this line as the team grows.
+# Default reviewer for everything. Add narrower rules below this line as the team grows; the last matching pattern wins.
 * @RemyLoveLogicAI

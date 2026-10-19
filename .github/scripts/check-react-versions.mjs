@@ -16,7 +16,9 @@ const installed = {
 };
 
 const problems = [];
-if (declared.react !== declared['react-dom']) {
+if (declared.react === undefined || declared['react-dom'] === undefined) {
+    problems.push('package.json must declare both react and react-dom in dependencies');
+} else if (declared.react !== declared['react-dom']) {
     problems.push(`package.json declares react ${declared.react} but react-dom ${declared['react-dom']}`);
 }
 if (installed.react !== installed['react-dom']) {

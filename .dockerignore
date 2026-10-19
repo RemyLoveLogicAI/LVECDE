@@ -1,5 +1,8 @@
 # Keep the Docker build context small and reproducible: dependencies are
 # installed inside the image, and local build output or secrets must not leak in.
+# Build-time config reaches the image only through build args (see the ARG/ENV
+# lines in the Dockerfile). A local .env is deliberately not copied, so secrets
+# never enter the build context or the builder stage's layer cache.
 .git
 .github
 .claude

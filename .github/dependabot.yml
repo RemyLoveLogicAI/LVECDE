@@ -18,13 +18,16 @@ updates:
         update-types: [minor, patch]
     ignore:
       # React Native's renderer accepts exactly one React version and throws
-      # "Incompatible React versions" on any other, even a patch release. So react
-      # and react-dom only change together with a React Native / Expo SDK upgrade
-      # (see .github/scripts/check-react-versions.mjs).
+      # "Incompatible React versions" on any other, even a patch release. So react,
+      # react-dom and react-test-renderer (which must equal react) only change
+      # together with a React Native / Expo SDK upgrade, and so does react-native
+      # itself (Expo pins one version per SDK). See .github/scripts/check-react-versions.mjs.
       - dependency-name: react
       - dependency-name: react-dom
-      # react-native itself moves with the Expo SDK; allow patch releases only.
+      - dependency-name: react-test-renderer
       - dependency-name: react-native
+      # Type definitions follow the React version Expo pins; allow patch updates only.
+      - dependency-name: "@types/react"
         update-types: [version-update:semver-minor, version-update:semver-major]
 
   - package-ecosystem: cargo
