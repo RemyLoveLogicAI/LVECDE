@@ -1,0 +1,17 @@
+# Keep the Docker build context small and reproducible: dependencies are
+# installed inside the image, and local build output or secrets must not leak in.
+.git
+.github
+.claude
+node_modules
+dist
+web-build
+.expo
+.env
+.env.*
+!.env.example
+ios
+android
+src-tauri/target
+**/*.log
+.DS_Store

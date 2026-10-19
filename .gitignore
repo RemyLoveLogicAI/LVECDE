@@ -45,3 +45,5 @@ yarn-error.*
 CLAUDE.local.md
 
 .dev/worktree/*
+# Claude Code plugin state (local, per-developer)
+.claude/memories/
