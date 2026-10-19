@@ -17,13 +17,13 @@ updates:
       npm-minor-and-patch:
         update-types: [minor, patch]
     ignore:
-      # React Native pins its renderer to an exact React version, so react,
-      # react-dom and react-native must move together with an Expo SDK
-      # upgrade. A lone bump breaks the app (see .github/scripts/check-react-versions.mjs).
+      # React Native's renderer accepts exactly one React version and throws
+      # "Incompatible React versions" on any other, even a patch release. So react
+      # and react-dom only change together with a React Native / Expo SDK upgrade
+      # (see .github/scripts/check-react-versions.mjs).
       - dependency-name: react
-        update-types: [version-update:semver-minor, version-update:semver-major]
       - dependency-name: react-dom
-        update-types: [version-update:semver-minor, version-update:semver-major]
+      # react-native itself moves with the Expo SDK; allow patch releases only.
       - dependency-name: react-native
         update-types: [version-update:semver-minor, version-update:semver-major]
 
@@ -54,3 +54,6 @@ updates:
       default-days: 7
     commit-message:
       prefix: "chore(ci)"
+    groups:
+      github-actions:
+        patterns: ["*"]
