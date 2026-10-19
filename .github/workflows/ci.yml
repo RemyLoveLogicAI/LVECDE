@@ -20,8 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: yarn
@@ -37,23 +37,26 @@ jobs:
     timeout-minutes: 20
     env:
       CI: "1"
-      NODE_ENV: production
-      APP_ENV: production
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: yarn
       - run: yarn install --frozen-lockfile
-      # Same command the Dockerfile runs for the production image.
+      # Same command and env the Dockerfile uses for the production image.
+      # NODE_ENV is set here, not on the job: with NODE_ENV=production yarn skips
+      # devDependencies during install and the patch-package postinstall fails.
       - run: yarn expo export --platform web --output-dir dist
+        env:
+          NODE_ENV: production
+          APP_ENV: production
 
   docker:
     name: Docker image builds
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build production image (not pushed)
         run: docker build --tag lvecde-web:ci .
