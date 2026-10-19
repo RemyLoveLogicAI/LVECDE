@@ -13,5 +13,5 @@
 - [ ] `yarn typecheck` is clean
 - [ ] `yarn vitest run` passes
 - [ ] User-visible strings use `t(...)` and exist in all 7 language files
-- [ ] Added a `CHANGELOG.md` entry if this changes behavior users see
+- [ ] Added a `CHANGELOG.md` entry if this changes behavior users see, then ran `npx tsx sources/scripts/parseChangelog.ts` to regenerate `sources/changelog/changelog.json`
 - [ ] Dependency changes keep `react` and `react-dom` on the same version

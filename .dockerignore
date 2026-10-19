@@ -12,6 +12,7 @@ web-build
 .expo
 .env
 .env.*
+*.env
 !.env.example
 ios
 android

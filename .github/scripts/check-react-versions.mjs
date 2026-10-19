@@ -36,16 +36,17 @@ try {
     );
     required = /"(\d+\.\d+\.\d+[^"]*)"\s*!==\s*isomorphicReactPackageVersion/.exec(readFileSync(renderer, 'utf8'))?.[1];
 } catch {
-    // fall through to the warning below
+    // fall through to the failure below
 }
 if (required === undefined) {
-    console.warn('::warning::Could not read the React version required by react-native; verify react matches it manually.');
+    // Fail closed: a renderer layout change must not silently disable the native check.
+    problems.push('could not read the React version required by react-native; update this script for the new renderer layout');
 } else if (required !== installed.react) {
     problems.push(`react-native requires react ${required} but installed react is ${installed.react}`);
 }
 
 if (problems.length > 0) {
-    console.error(`react / react-dom version mismatch:\n- ${problems.join('\n- ')}`);
+    console.error(`react version check failed:\n- ${problems.join('\n- ')}`);
     process.exit(1);
 }
 console.log(`react and react-dom are both ${installed.react}` + (required ? `, as react-native requires` : ''));
