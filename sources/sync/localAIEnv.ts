@@ -77,6 +77,15 @@ export function getLocalAIConfigFromEnv() {
     };
 }
 
+interface EnvVarDoc {
+    description: string;
+    type: string;
+    default: string;
+    example: string;
+    range?: string;
+    options?: readonly string[];
+}
+
 /**
  * Environment variable documentation
  */
@@ -151,7 +160,7 @@ export function generateEnvTemplate(): string {
         '',
     ];
 
-    for (const [key, doc] of Object.entries(LOCAL_AI_ENV_DOCS)) {
+    for (const [key, doc] of Object.entries<EnvVarDoc>(LOCAL_AI_ENV_DOCS)) {
         lines.push(`# ${doc.description}`);
         lines.push(`# Type: ${doc.type}${doc.range ? ` (${doc.range})` : ''}`);
         if (doc.options) {
