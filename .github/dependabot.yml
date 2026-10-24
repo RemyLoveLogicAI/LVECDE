@@ -1,0 +1,62 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    # Wait a week before proposing a freshly published version, so a compromised
+    # or yanked release is usually caught before it reaches a PR.
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    # One PR for routine bumps instead of one per package.
+    groups:
+      npm-minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # React Native's renderer accepts exactly one React version and throws
+      # "Incompatible React versions" on any other, even a patch release. So react,
+      # react-dom and react-test-renderer (which must equal react) only change
+      # together with a React Native / Expo SDK upgrade, and so does react-native
+      # itself (Expo pins one version per SDK). See .github/scripts/check-react-versions.mjs.
+      - dependency-name: react
+      - dependency-name: react-dom
+      - dependency-name: react-test-renderer
+      - dependency-name: react-native
+      # Type definitions follow the React version Expo pins; allow patch updates only.
+      - dependency-name: "@types/react"
+        update-types: [version-update:semver-minor, version-update:semver-major]
+
+  - package-ecosystem: cargo
+    directory: /src-tauri
+    schedule:
+      interval: weekly
+      day: monday
+    # Wait a week before proposing a freshly published version, so a compromised
+    # or yanked release is usually caught before it reaches a PR.
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      cargo-minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    # Wait a week before proposing a freshly published version, so a compromised
+    # or yanked release is usually caught before it reaches a PR.
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore(ci)"
+    groups:
+      github-actions:
+        patterns: ["*"]
