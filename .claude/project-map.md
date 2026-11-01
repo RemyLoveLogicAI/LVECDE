@@ -102,7 +102,7 @@ yarn start:local-server       # point at a local sync server on localhost:3005
 |--------|-----|-------|
 | Web (production) | Netlify, `netlify.toml` | Builds `yarn expo export --platform web` into `dist/`. Site `lvecde`; deploys once the repo is linked in Netlify |
 | Web (container) | `Dockerfile` | nginx image, built by CI only (no push) |
-| iOS/Android | EAS (`eas.json`), `yarn ota` | `release-*.sh` and `deploy/happy-app.yaml` belong to the upstream maintainer's accounts |
+| iOS/Android | EAS builds (`eas.json`); OTA updates: `yarn ota` (preview branch), `yarn ota:production` (production workflow) | `release-*.sh` and `deploy/happy-app.yaml` belong to the upstream maintainer's accounts |
 | Desktop | Tauri (`src-tauri/`) | not built in CI |
 
 ### Environment Variables
