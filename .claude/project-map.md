@@ -48,17 +48,18 @@
 
 ## API Surface (client calls to the sync server)
 
-All requests use a bearer token from QR auth. Payloads are end-to-end encrypted, so the server only stores ciphertext.
+Requests carry the bearer token obtained through QR auth, except the auth bootstrap calls (`POST /v1/auth`, `/v1/auth/request`, `/v1/auth/account/request` and their status polls), which run before a token exists. Session content, messages, machine metadata, artifacts and account settings are encrypted on the client before upload. Account profile, friends, feed, usage and push tokens are sent as plain JSON the server can read.
 
 - **Auth:** `POST /v1/auth`, `/v1/auth/request/status`, `/v1/auth/response`, `/v1/auth/account/request`, `/v1/auth/account/response`
-- **Sessions:** `GET /v1/sessions`, `/v1/sessions/:id`, `/v1/sessions/:id/messages`
+- **Sessions:** `GET /v1/sessions`, `GET /v1/sessions/:id/messages`, `DELETE /v1/sessions/:id`
 - **Machines:** `GET /v1/machines`
 - **Account:** `/v1/account/profile`, `/v1/account/settings`, `/v1/usage/query`, `/v1/push-tokens`
 - **Social:** `/v1/friends`, `/v1/friends/add`, `/v1/friends/remove`, `/v1/user/:id`, `/v1/user/search`, `/v1/feed`
 - **Storage:** `/v1/artifacts`, `/v1/artifacts/:id`, `/v1/kv`, `/v1/kv/:key`, `/v1/kv/bulk`
-- **Integrations:** `/v1/connect/github`, `/v1/connect/github/params`, `/v1/connect/:vendor`, `/v1/connect/:vendor/register`, `/v1/oauth/token`
+- **Integrations:** `/v1/connect/github`, `/v1/connect/github/params`, `/v1/connect/:vendor`, `/v1/connect/:vendor/register`
+- **External (not the sync server):** Claude OAuth token exchange at `https://console.anthropic.com/v1/oauth/token` (`sources/utils/oauth.ts`)
 - **Misc:** `/v1/version`, `/v1/updates`
-- **Socket.io:** server pushes `update` and `ephemeral`; the client sends `rpc-call` (with ack) and `machine-connect`
+- **Socket.io:** the server pushes `update` and `ephemeral`; the client emits `rpc-call` (with ack), `message`, and `machine-update-metadata` (with ack)
 
 ## Data Model (client side)
 
@@ -81,7 +82,7 @@ Main routes (under `sources/app/(app)/`):
 - `/artifacts` (+ `new`, `[id]`, `edit/[id]`), `/zen` (todos), `/changelog`, `/restore` (+ `manual`), `/server` (custom server URL)
 - `/dev/*`: developer and test pages (no i18n)
 
-The root layout (`sources/app/_layout.tsx`) sets up the providers (Auth, Modal, Realtime, CommandPalette) and navigation. Pages are wrapped in `memo`, and styles go at the bottom of each file (see `CLAUDE.md`).
+The root layout (`sources/app/_layout.tsx`) sets up the providers (Auth, Modal, Realtime, CommandPalette) and navigation. `CLAUDE.md` asks for new pages to be wrapped in `memo` with styles at the bottom of the file; some existing pages (for example `index.tsx`) predate that rule.
 
 ## Infrastructure
 
@@ -89,8 +90,11 @@ The root layout (`sources/app/_layout.tsx`) sets up the providers (Auth, Modal, 
 ```bash
 yarn install                  # also runs patch-package
 yarn web                      # Expo web dev server (port 8081)
-yarn ios | yarn android       # native, requires simulator/emulator
-yarn start:local-server       # point at a local sync server on :3005
+yarn ios                      # iOS simulator
+yarn android                  # Android emulator
+yarn start:local-server       # point at a local sync server on localhost:3005
+# Android emulators can't reach the host as localhost: use
+# EXPO_PUBLIC_HAPPY_SERVER_URL=http://10.0.2.2:3005 or set the URL in the app at /server
 ```
 
 ### Builds and Deploys
@@ -144,6 +148,6 @@ See `.env.example` for the full list with defaults.
 - The app does nothing useful without a reachable sync server; it shows "disconnected" otherwise
 - GitHub Actions has failed to start since 2026-10-26 (most likely a billing or spending limit on the account), so CI is not checking `main`
 - A separately connected Cloudflare Workers build (`lvecde`) fails on every push
-- The Tauri and Docker builds can only be verified in CI, not in the cloud dev container
+- The Docker image is built only in CI (no Docker daemon in the cloud dev container); the Tauri desktop build is not built in CI at all, so verify it locally with `yarn tauri build` on a machine with the Tauri system dependencies
 - Release scripts and the Kubernetes manifest still target the upstream maintainer's accounts
 - GitHub reports many open Dependabot alerts on `main`
