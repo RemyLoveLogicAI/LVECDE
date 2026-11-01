@@ -1,0 +1,19 @@
+# Netlify build for the web target (Expo static export). Mirrors the Dockerfile:
+# NODE_ENV/APP_ENV apply to the export only, because NODE_ENV=production during
+# `yarn install` would skip devDependencies (patch-package) and fail the install.
+# The install flags below also pass --production=false, so the install still
+# works if someone later sets NODE_ENV=production as a site or team variable.
+[build]
+    command = "APP_ENV=production NODE_ENV=production yarn expo export --platform web --output-dir dist"
+    publish = "dist"
+
+[build.environment]
+    NODE_VERSION = "20"
+    YARN_FLAGS = "--frozen-lockfile --ignore-engines --production=false"
+
+# The app is a single-page export (app.config.js: web.output = "single"), so
+# every path must serve index.html and let the client router handle it.
+[[redirects]]
+    from = "/*"
+    to = "/index.html"
+    status = 200
