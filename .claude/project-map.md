@@ -48,7 +48,7 @@
 
 ## API Surface (client calls to the sync server)
 
-Requests carry the bearer token obtained through QR auth, except the auth bootstrap calls (`POST /v1/auth`, `/v1/auth/request/status`, `/v1/auth/account/request`), which run before a token exists. Session content, messages, machine metadata, artifacts and account settings are encrypted on the client before upload. Account profile, friends, feed, usage and push tokens are sent as plain JSON the server can read.
+Requests carry the bearer token obtained through QR auth, except three auth calls that send no token: `POST /v1/auth` and `POST /v1/auth/account/request` (sign-in, before a token exists), and `GET /v1/auth/request/status`, which an already signed-in device calls to check a terminal's pending pairing request before approving it with an authenticated `POST /v1/auth/response`. Session content, messages, machine metadata, artifacts and account settings are encrypted on the client before upload. Account profile, friends, feed, usage and push tokens are sent as plain JSON the server can read.
 
 - **Auth:** `POST /v1/auth`, `/v1/auth/request/status`, `/v1/auth/response`, `/v1/auth/account/request`, `/v1/auth/account/response`
 - **Sessions:** `GET /v1/sessions`, `GET /v1/sessions/:id/messages`, `DELETE /v1/sessions/:id`
