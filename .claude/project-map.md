@@ -48,7 +48,7 @@
 
 ## API Surface (client calls to the sync server)
 
-Requests carry the bearer token obtained through QR auth, except the auth bootstrap calls (`POST /v1/auth`, `/v1/auth/request`, `/v1/auth/account/request` and their status polls), which run before a token exists. Session content, messages, machine metadata, artifacts and account settings are encrypted on the client before upload. Account profile, friends, feed, usage and push tokens are sent as plain JSON the server can read.
+Requests carry the bearer token obtained through QR auth, except the auth bootstrap calls (`POST /v1/auth`, `/v1/auth/request/status`, `/v1/auth/account/request`), which run before a token exists. Session content, messages, machine metadata, artifacts and account settings are encrypted on the client before upload. Account profile, friends, feed, usage and push tokens are sent as plain JSON the server can read.
 
 - **Auth:** `POST /v1/auth`, `/v1/auth/request/status`, `/v1/auth/response`, `/v1/auth/account/request`, `/v1/auth/account/response`
 - **Sessions:** `GET /v1/sessions`, `GET /v1/sessions/:id/messages`, `DELETE /v1/sessions/:id`
@@ -58,10 +58,10 @@ Requests carry the bearer token obtained through QR auth, except the auth bootst
 - **Storage:** `/v1/artifacts`, `/v1/artifacts/:id`, `/v1/kv`, `/v1/kv/:key`, `/v1/kv/bulk`
 - **Integrations:** `/v1/connect/github`, `/v1/connect/github/params`, `/v1/connect/:vendor`, `/v1/connect/:vendor/register`
 - **External (not the sync server):** Claude OAuth token exchange at `https://console.anthropic.com/v1/oauth/token` (`sources/utils/oauth.ts`)
-- **Misc:** `/v1/version`, `/v1/updates`
-- **Socket.io:** the server pushes `update` and `ephemeral`; the client emits `rpc-call` (with ack), `message`, and `machine-update-metadata` (with ack)
+- **Misc:** `/v1/version`
+- **Socket.io** (connects at path `/v1/updates`, not a REST endpoint): the server pushes `update` and `ephemeral`; the client emits `rpc-call` (with ack), `message`, and `machine-update-metadata` (with ack)
 
-## Data Model (client side)
+## Data Model (client-side)
 
 There is no database in this repo. Data comes from the server and persists locally in MMKV (`sync/persistence.ts`, `sync/storage.ts`). Main types are in `sync/storageTypes.ts` and `sync/typesMessage.ts`:
 
@@ -87,6 +87,7 @@ The root layout (`sources/app/_layout.tsx`) sets up the providers (Auth, Modal, 
 ## Infrastructure
 
 ### Local Development
+
 ```bash
 yarn install                  # also runs patch-package
 yarn web                      # Expo web dev server (port 8081)
@@ -98,6 +99,7 @@ yarn start:local-server       # point at a local sync server on localhost:3005
 ```
 
 ### Builds and Deploys
+
 | Target | How | Notes |
 |--------|-----|-------|
 | Web (production) | Netlify, `netlify.toml` | Builds `yarn expo export --platform web` into `dist/`. Site `lvecde`; deploys once the repo is linked in Netlify |
@@ -106,6 +108,7 @@ yarn start:local-server       # point at a local sync server on localhost:3005
 | Desktop | Tauri (`src-tauri/`) | not built in CI |
 
 ### Environment Variables
+
 | Variable | Purpose | Required |
 |----------|---------|----------|
 | `EXPO_PUBLIC_HAPPY_SERVER_URL` | sync server URL (default `https://api.cluster-fluster.com`; can be overridden in-app at `/server`) | No |
@@ -113,8 +116,7 @@ yarn start:local-server       # point at a local sync server on localhost:3005
 | `EXPO_PUBLIC_POSTHOG_API_KEY` | analytics | No |
 | `EXPO_PUBLIC_REVENUE_CAT_APPLE` / `_GOOGLE` / `_STRIPE` | in-app purchases | No |
 | `EXPO_PUBLIC_LOCAL_AI_ENABLED` / `_PROVIDER` / `_ENDPOINT` / `_MODEL` | Local AI (Ollama, LM Studio) | No |
-| `HAPPY_LOCAL_AI_*`, `HAPPY_VOICE_*` | Local AI tuning and local voice | No |
-| `EXPO_PUBLIC_DEBUG` | debug logging | No |
+| `HAPPY_LOCAL_AI_*`, `HAPPY_VOICE_*` | declared in `sync/localAIEnv.ts` but not read by the app yet, so setting them has no effect | No |
 
 See `.env.example` for the full list with defaults.
 
